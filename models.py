@@ -36,6 +36,8 @@ def setup_db(app, database_path=database_path):
 
 
 #INSERT INTO users (identifier, name) VALUES ('hello123', 'Alice');
+#INSERT INTO users (identifier, name) VALUES ('auth0|6062c68ad850f9007156eb43', 'User');
+
 class User(db.Model):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)

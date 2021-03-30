@@ -6,6 +6,7 @@ from models import setup_db, db, User, Baby, UserWord, \
   FirstSpokenWord, UserWordCategory, UserCategory, \
     DefaultWord, DefaultWordCategory, DefaultCategory
 import datetime
+from auth import AuthError, requires_auth
 
 def create_app(test_config=None):
     # create and configure the app
@@ -17,8 +18,9 @@ app = create_app()
 setup_db(app)
 
 @app.route('/user')
-def get_user():
-    identifier = 'hello123'
+@requires_auth('crud:own_data')
+def get_user(payload):
+    identifier = payload['sub']
     user = User.query.filter(User.identifier==identifier).one_or_none()
     return jsonify({
              "success": True,
@@ -26,6 +28,7 @@ def get_user():
         })
 
 @app.route('/user', methods=['PATCH'])
+@requires_auth('crud:own_data')
 def edit_user():
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -47,6 +50,7 @@ def edit_user():
 
 
 @app.route('/babies')
+@requires_auth('crud:own_data')
 def get_babies():
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -57,6 +61,7 @@ def get_babies():
         })
 
 @app.route('/babies', methods=['POST'])
+@requires_auth('crud:own_data')
 def add_baby():
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -79,6 +84,7 @@ def add_baby():
         db.session.close()
 
 @app.route('/baby/<int:baby_id>', methods=['PATCH'])
+@requires_auth('crud:own_data')
 def edit_baby(baby_id):
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -113,6 +119,7 @@ def edit_baby(baby_id):
 
 
 @app.route('/categories')
+@requires_auth('crud:own_data')
 def show_categories():
     #maybe add a /login_result endpoint that handles user reaction 
     #get payload from requires auth, pull out "sub" as identifier
@@ -129,6 +136,7 @@ def show_categories():
     })
 
 @app.route('/category/<int:category_id>')
+@requires_auth('crud:own_data')
 def show_category(category_id):
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -145,11 +153,14 @@ def show_category(category_id):
     })
 
 @app.route('/category/<int:category_id>/baby/<int:baby_id>')
+@requires_auth('crud:own_data')
 def show_category_for_baby(category_id, baby_id):
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
     category_user = UserCategory.query.filter_by(id=category_id).one_or_none().user
-    assert user.id == category_user
+    if user.id != category_user:
+        # do not return 401 to prevent leaking information
+        abort(404)  
 
     word_cats = UserWordCategory.query.filter_by(user_category=category_id).all()
     words = [wc.word for wc in word_cats]
@@ -164,7 +175,9 @@ def show_category_for_baby(category_id, baby_id):
         "babywords": babywords
     })
 
+
 @app.route('/baby/<baby_id>/timeline')
+@requires_auth('crud:own_data')
 def display_baby_timeline(baby_id):
     currbaby = Baby.query.filter_by(id=baby_id).one_or_none()
     if not currbaby: abort(404)
@@ -175,7 +188,21 @@ def display_baby_timeline(baby_id):
     })
 
 
+@app.route('/baby/<baby_id>/timeline/public')
+@requires_auth('crud:own_data')
+def display_baby_timeline_public(baby_id):
+    currbaby = Baby.query.filter_by(id=baby_id).one_or_none()
+    if not currbaby or not currbaby.public: abort(404)
+
+    first_spoken_words = FirstSpokenWord.query.filter_by(baby_id=baby_id).order_by(FirstSpokenWord.date).all()
+    return jsonify({
+        "success": True,
+        "first_spoken_words": [w.format() for w in first_spoken_words]
+    })
+
+
 @app.route('/categories', methods=['POST'])
+#@requires_auth('crud:own_data')
 def add_category():
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -213,22 +240,22 @@ def add_word():
         newWord = UserWord(user=user, name=name)
         
         db.session.add(newWord)
-        db.session.commit()
+        db.session.flush()
+        #db.session.refresh()
         
         categories = body.get('categories', None)
-        newWordCategoriesIds = []
+        newWordCategories = []
         if categories:
             for category in categories:
                 newWordCategory = UserWordCategory(user=user, user_word=newWord.id, user_category=category)
                 db.session.add(newWordCategory)
-                db.session.commit()
-                newWordCategoriesIds.append(newWordCategory.id)
+                newWordCategories.append(newWordCategory)
         
         db.session.commit()
         return jsonify({
              "success": True,
              "created_word_id": newWord.id,
-             "created_word_category_ids": newWordCategoriesIds,
+             "created_word_category_ids": [c.id for c in newWordCategories],
         })
         
     except Exception as e:
@@ -239,6 +266,7 @@ def add_word():
         db.session.close()
 
 @app.route('/first_spoken_words', methods=['POST'])
+@requires_auth('crud:own_data')
 def add_first_spoken_word():
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -268,6 +296,7 @@ curl http://0.0.0.0:8080/category/2 -X PATCH \
 -d '{"name":"Spiky Fruits"}'
 '''
 @app.route('/category/<int:category_id>', methods=['PATCH'])
+@requires_auth('crud:own_data')
 def edit_category(category_id):
     identifier = 'hello123'
     user = User.query.filter(User.identifier==identifier).one_or_none()
@@ -432,8 +461,14 @@ def server_errors(error):
         "message": "server errors"
     }), 500
 
-
-
+@app.errorhandler(AuthError)
+def auth_error(error):
+    print(error)
+    return jsonify({
+        "success": False,
+        "error": error.error['code'],
+        "message": error.error['description']
+    }), error.status_code
 
 
 
