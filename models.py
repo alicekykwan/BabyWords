@@ -62,7 +62,16 @@ class Baby(db.Model):
     #Baby.words_backref = all rows in FirstSpoken that belong to this Baby.
     #If this Baby is deleted, rows in FirstSpoken corresponding to this Baby will be deleted as well
 
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'birthday': self.birthday,
+            'public': self.public
+        }
+
 #INSERT INTO user_words ("user", name) VALUES (1, 'Banana');
+#INSERT INTO user_words ("user", name) VALUES (1, 'Apple');
 class UserWord(db.Model):
     __tablename__ = 'user_words'
     id = Column(Integer, primary_key=True)
@@ -70,6 +79,12 @@ class UserWord(db.Model):
     name = Column(String, nullable=False)
     user_word_categories = db.relationship('UserWordCategory', backref='word', lazy='joined', cascade='all, delete')
     first_spoken_words = db.relationship('FirstSpokenWord', backref='word', lazy='joined', cascade='all, delete')
+    
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
 #INSERT INTO user_categories ("user", name) VALUES (1, 'Fruits');
 class UserCategory(db.Model):
@@ -79,8 +94,15 @@ class UserCategory(db.Model):
     name = Column(String, nullable=False)
     user_word_categories = db.relationship('UserWordCategory', backref='category', lazy='joined', cascade='all, delete')
     UniqueConstraint('user', 'name')
+    
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
-#INSERT INTO first_spoken_words (baby_id, user_word, "user", date) VALUES (1, 1, 1, '2020-03-01');
+#INSERT INTO first_spoken_words (baby_id, user_word, "user", date) VALUES (2, 1, 1, '2020-03-01');
+#INSERT INTO first_spoken_words (baby_id, user_word, "user", date) VALUES (2, 2, 1, '2020-03-01');
 class FirstSpokenWord(db.Model):
     __tablename__ = 'first_spoken_words'
     id = Column(Integer, primary_key=True)
@@ -90,13 +112,24 @@ class FirstSpokenWord(db.Model):
     date = Column(Date, nullable=False)
     details = Column(String)
 
+    def format(self):
+        return {
+            'id': self.id,
+            'word_id': self.user_word,
+            'word': self.word.name,
+            'baby_id': self.baby_id,
+            'baby_name': self.baby.name,
+            'date': self.date,
+            'details': self.details
+        }
+
 #INSERT INTO user_word_categories ("user", user_word, user_category) VALUES (1, 1, 1);
 class UserWordCategory(db.Model):
     __tablename__ = 'user_word_categories'
     id = Column(Integer, primary_key=True)
     user = Column(Integer, db.ForeignKey('users.id'))
-    user_word = Column(Integer, db.ForeignKey('user_words.id'))
-    user_category = Column(Integer, db.ForeignKey('user_categories.id'))
+    user_word = Column(Integer, db.ForeignKey('user_words.id'), nullable=False)
+    user_category = Column(Integer, db.ForeignKey('user_categories.id'), nullable=False)
 
 class DefaultCategory(db.Model):
     __tablename__ = 'default_categories'
