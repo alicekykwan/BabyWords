@@ -1,11 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, Date, Boolean, create_engine, UniqueConstraint
 import os
+
 # from dotenv import load_dotenv
 # load_dotenv()
 
+#diagram: https://dbdiagram.io/d/60610dd4ecb54e10c33da98d
 
-database_name = "BabyWords"
+database_name = "BabyWords_Test"
 # username and password to be configured in the .env file in the same
 # directory or in a python terminal shell
 database_username = os.environ.get('database_username')
@@ -55,8 +57,8 @@ class User(db.Model):
 class Baby(db.Model):
     __tablename__ = 'babies'
     id = Column(Integer, primary_key=True)
-    user = Column(Integer, db.ForeignKey('users.id'))
-    name = Column(String)
+    user = Column(Integer, db.ForeignKey('users.id'), nullable=False)
+    name = Column(String, nullable=False)
     birthday = Column(Date)
     public = Column(Boolean, default=False)
 
@@ -74,6 +76,7 @@ class Baby(db.Model):
 
 #INSERT INTO user_words ("user", name) VALUES (1, 'Banana');
 #INSERT INTO user_words ("user", name) VALUES (1, 'Apple');
+#INSERT INTO user_words ("user", name) VALUES (2, 'Tomato');
 class UserWord(db.Model):
     __tablename__ = 'user_words'
     id = Column(Integer, primary_key=True)
@@ -108,9 +111,9 @@ class UserCategory(db.Model):
 class FirstSpokenWord(db.Model):
     __tablename__ = 'first_spoken_words'
     id = Column(Integer, primary_key=True)
-    baby_id = Column(Integer, db.ForeignKey('babies.id'))
-    user_word = Column(Integer, db.ForeignKey('user_words.id'))
-    user = Column(Integer, db.ForeignKey('users.id'))
+    baby_id = Column(Integer, db.ForeignKey('babies.id'), nullable=False)
+    user_word = Column(Integer, db.ForeignKey('user_words.id'), nullable=False)
+    user = Column(Integer, db.ForeignKey('users.id'), nullable=False)
     date = Column(Date, nullable=False)
     details = Column(String)
 
@@ -133,21 +136,41 @@ class UserWordCategory(db.Model):
     user_word = Column(Integer, db.ForeignKey('user_words.id'), nullable=False)
     user_category = Column(Integer, db.ForeignKey('user_categories.id'), nullable=False)
 
+#INSERT INTO default_categories (name) VALUES ('Fruits');
+#INSERT INTO default_categories (name) VALUES ('Colors');
 class DefaultCategory(db.Model):
     __tablename__ = 'default_categories'
     id = Column(Integer, primary_key=True)
-    category_name = Column(String, unique=True, nullable=False)
+    name = Column(String, unique=True, nullable=False)
     default_word_categories = db.relationship('DefaultWordCategory', backref='category', lazy='joined', cascade='all, delete')
+    
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
+#INSERT INTO default_words (name) VALUES ('Orange');
+#INSERT INTO default_words (name) VALUES ('Watermelon');
 class DefaultWord(db.Model):
     __tablename__ = 'default_words'
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
     default_word_categories = db.relationship('DefaultWordCategory', backref='word', lazy='joined', cascade='all, delete')
-    
+
+    def format(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+        
+#INSERT INTO default_word_categories (default_word, default_category) VALUES (1, 1);
+#INSERT INTO default_word_categories (default_word, default_category) VALUES (1, 2);
+#INSERT INTO default_word_categories (default_word, default_category) VALUES (2, 1);            
 class DefaultWordCategory(db.Model):
     __tablename__ = 'default_word_categories'
     id = Column(Integer, primary_key=True)
-    default_word = Column(Integer, db.ForeignKey('default_words.id'))
-    default_category = Column(Integer, db.ForeignKey('default_categories.id'))
+    default_word = Column(Integer, db.ForeignKey('default_words.id'), nullable=False)
+    default_category = Column(Integer, db.ForeignKey('default_categories.id'), nullable=False)
+    UniqueConstraint(default_word, default_category)
 
