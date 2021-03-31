@@ -102,7 +102,7 @@ def create_app(test_config=None):
         try:
             body = request.get_json()
             currbaby = Baby.query.filter_by(id=baby_id).one_or_none()
-            if not currbaby: abort(404)
+            if not currbaby or currbaby.user != user.id: abort(404)
 
             name = body.get('name', None)
             if name:
@@ -136,9 +136,6 @@ def create_app(test_config=None):
         #get payload from requires auth, pull out "sub" as identifier
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
-        if user is None:
-            #handle create a new user
-            pass
         categories = UserCategory.query.filter_by(user=user.id).all()
         cat_objects = [c.format() for c in categories]
         return jsonify({
@@ -178,7 +175,8 @@ def create_app(test_config=None):
         babywords = []
         for word in words:
             babyword = FirstSpokenWord.query.filter_by(baby_id=baby_id).filter_by(user_word=word.id).one_or_none()
-            babywords.append(babyword.format())
+            if babyword:
+                babywords.append(babyword.format())
         
         return jsonify({
             "success": True,
@@ -241,7 +239,7 @@ def create_app(test_config=None):
             return jsonify({
                 "success": True,
                 "created_category_id": newCategory.id
-            })
+            }), 201
         except:
             db.session.rollback()
             abort(422)
@@ -256,7 +254,7 @@ def create_app(test_config=None):
     ''' 
     @app.route('/words', methods=['POST'])
     @requires_auth('crud:own_data')
-    def add_word():
+    def add_word(payload):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
         try:
@@ -267,7 +265,6 @@ def create_app(test_config=None):
             
             db.session.add(newWord)
             db.session.flush()
-            #db.session.refresh()
             
             categories = body.get('categories', None)
             newWordCategories = []
@@ -282,7 +279,7 @@ def create_app(test_config=None):
                 "success": True,
                 "created_word_id": newWord.id,
                 "created_word_category_ids": [c.id for c in newWordCategories],
-            })
+            }), 201
             
         except Exception as e:
             app.logger.error(e)
@@ -293,7 +290,7 @@ def create_app(test_config=None):
 
     @app.route('/first_spoken_words', methods=['POST'])
     @requires_auth('crud:own_data')
-    def add_first_spoken_word():
+    def add_first_spoken_word(payload):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
         try:
@@ -308,7 +305,7 @@ def create_app(test_config=None):
             return jsonify({
                 "success": True,
                 "created_first_spoken_word_id": newFirstSpokenWord.id
-            })
+            }), 201
         except:
             db.session.rollback()
             abort(422)
@@ -323,7 +320,7 @@ def create_app(test_config=None):
     '''
     @app.route('/category/<int:category_id>', methods=['PATCH'])
     @requires_auth('crud:own_data')
-    def edit_category(category_id):
+    def edit_category(payload, category_id):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
         try:
@@ -357,7 +354,7 @@ def create_app(test_config=None):
     '''
     @app.route('/word/<int:word_id>', methods=['PATCH'])
     @requires_auth('crud:own_data')
-    def edit_word(word_id):
+    def edit_word(payload, word_id):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
         try:
@@ -441,9 +438,9 @@ def create_app(test_config=None):
     def delete_category(payload, category_id):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
+        currCategory = UserCategory.query.filter_by(id=category_id).one_or_none()
+        if not currCategory or currCategory.user != user.id : abort(404)
         try:
-            currCategory = UserCategory.query.filter_by(id=category_id).one_or_none()
-            if not currCategory or currCategory.user != user.id : abort(404)
             db.session.delete(currCategory)
             db.session.commit()
             return jsonify({
@@ -452,7 +449,6 @@ def create_app(test_config=None):
             })
         except Exception as e:
             db.session.rollback()
-            app.logger.error(e)
             abort(422)
         finally:
             db.session.close()
@@ -462,9 +458,9 @@ def create_app(test_config=None):
     def delete_word(payload, word_id):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
+        currWord = UserWord.query.filter_by(id=word_id).one_or_none()
+        if not currWord or currWord.user != user.id: abort(404)
         try:
-            currWord = UserWord.query.filter_by(id=word_id).one_or_none()
-            if not currWord or currWord.user != user.id: abort(404)
             db.session.delete(currWord)
             db.session.commit()
             return jsonify({
@@ -484,9 +480,9 @@ def create_app(test_config=None):
     def delete_first_spoken_word(payload, first_spoken_word_id):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
+        currFirstSpoken = FirstSpokenWord.query.filter_by(id=first_spoken_word_id).one_or_none()
+        if not currFirstSpoken or currFirstSpoken.user != user.id: abort(404)
         try:
-            currFirstSpoken = FirstSpokenWord.query.filter_by(id=first_spoken_word_id).one_or_none()
-            if not currFirstSpoken or currFirstSpoken.user != user.id: abort(404)
             db.session.delete(currFirstSpoken)
             db.session.commit()
             return jsonify({
@@ -510,7 +506,7 @@ def create_app(test_config=None):
             return jsonify({
                 "success": True,
                 "redirect": "to go homepage"
-            }, 301) #front end handles redirect after getting this message?
+            }), 301 #front end handles redirect after getting this message?
         
         try:
             newUser = User(identifier=identifier)
@@ -521,7 +517,7 @@ def create_app(test_config=None):
             return jsonify({
                 "success": True,
                 "created_user_id": newUser.id
-            }, 201)
+            }), 201
         
         except Exception as e:
             db.session.rollback()
@@ -567,7 +563,7 @@ def create_app(test_config=None):
             return jsonify({
                 "success": True,
                 "created_category_id": newCategory.id
-            })
+            }), 201
         except:
             db.session.rollback()
             abort(422)
@@ -602,7 +598,7 @@ def create_app(test_config=None):
                 "success": True,
                 "created_word_id": newWord.id,
                 "created_word_category_ids": [c.id for c in newWordCategories],
-            })
+            }), 201
             
         except Exception as e:
             app.logger.error(e)
@@ -616,9 +612,9 @@ def create_app(test_config=None):
     @app.route('/default_category/<int:category_id>', methods=['DELETE'])
     @requires_auth('crud:default_values')
     def delete_default_category(payload, category_id):
+        currCategory = DefaultCategory.query.filter_by(id=category_id).one_or_none()
+        if not currCategory: abort(404)
         try:
-            currCategory = DefaultCategory.query.filter_by(id=category_id).one_or_none()
-            if not currCategory: abort(404)
             db.session.delete(currCategory)
             db.session.commit()
             return jsonify({
@@ -635,9 +631,9 @@ def create_app(test_config=None):
     @app.route('/default_word/<int:word_id>', methods=['DELETE'])
     @requires_auth('crud:default_values')
     def delete_default_word(payload, word_id):
+        currWord = DefaultWord.query.filter_by(id=word_id).one_or_none()
+        if not currWord: abort(404)
         try:
-            currWord = DefaultWord.query.filter_by(id=word_id).one_or_none()
-            if not currWord: abort(404)
             db.session.delete(currWord)
             db.session.commit()
             return jsonify({

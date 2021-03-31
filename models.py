@@ -98,7 +98,9 @@ class UserCategory(db.Model):
     user = Column(Integer, db.ForeignKey('users.id'))
     name = Column(String, nullable=False)
     user_word_categories = db.relationship('UserWordCategory', backref='category', lazy='joined', cascade='all, delete')
-    UniqueConstraint('user', 'name')
+    __table_args__ = (
+        UniqueConstraint('user', 'name'),
+    )
     
     def format(self):
         return {
@@ -108,6 +110,7 @@ class UserCategory(db.Model):
 
 #INSERT INTO first_spoken_words (baby_id, user_word, "user", date) VALUES (2, 1, 1, '2020-03-01');
 #INSERT INTO first_spoken_words (baby_id, user_word, "user", date) VALUES (2, 2, 1, '2020-03-01');
+#INSERT INTO first_spoken_words (baby_id, user_word, "user", date) VALUES (1, 1, 1, '2021-03-01');
 class FirstSpokenWord(db.Model):
     __tablename__ = 'first_spoken_words'
     id = Column(Integer, primary_key=True)
@@ -172,5 +175,6 @@ class DefaultWordCategory(db.Model):
     id = Column(Integer, primary_key=True)
     default_word = Column(Integer, db.ForeignKey('default_words.id'), nullable=False)
     default_category = Column(Integer, db.ForeignKey('default_categories.id'), nullable=False)
-    UniqueConstraint(default_word, default_category)
-
+    __table_args__ = (
+        UniqueConstraint(default_word, default_category),
+    )
