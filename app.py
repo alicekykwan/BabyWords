@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, abort, jsonify
+from flask import Flask, request, abort, jsonify, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from models import setup_db, db, User, Baby, UserWord, \
@@ -9,6 +9,8 @@ import datetime
 from auth import AuthError, requires_auth
 from new_user import populate_defaults
 from reset_db import reset_database
+
+loginURL = os.environ.get('loginURL')
 
 def create_app(test_config=None):
     # create and configure the app
@@ -29,6 +31,10 @@ def create_app(test_config=None):
     '''
     ******************************************************
     '''
+    @app.route('/login')
+    def login():
+        return redirect(loginURL)
+    
     @app.route('/user')
     @requires_auth('crud:own_data')
     def get_user(payload):
