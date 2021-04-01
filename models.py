@@ -2,16 +2,13 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, Date, Boolean, create_engine, UniqueConstraint
 import os
 
-# from dotenv import load_dotenv
-# load_dotenv()
 
-#diagram: https://dbdiagram.io/d/60610dd4ecb54e10c33da98d
+# database name, username and password are in
+# setup.sh file in the same directory \
+# run "source setup.sh" in terminal 
 
-database_name = "BabyWords_Test"
-# username and password to be configured in the .env file in the same
-# directory or in a python terminal shell
+database_name = os.environ.get('database_name')
 database_username = os.environ.get('database_username')
-database_username = 'testuser'
 database_user_pw = os.environ.get(
     'database_user_pw') if os.environ.get('database_user_pw') else ''
 database_path = "postgresql://{}:{}@{}/{}".format(
@@ -49,7 +46,6 @@ class User(db.Model):
     def format(self):
         return {
             'id': self.id,
-            'identifier': self.identifier,
             'name': self.name
         }
 

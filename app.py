@@ -21,11 +21,13 @@ def create_app(test_config=None):
         db.create_all()
         reset_database(db)
     '''
-    *** UNCOMMENT AFTER FIRST RUN ***
+    ************ UNCOMMENT AFTER FIRST RUN ************
+    This will reset the database and populate it with defaults specified in reset_db.py.
+    All user information will be lost.
     '''
     #db_drop_and_create_all()
     '''
-    ***
+    ******************************************************
     '''
     @app.route('/user')
     @requires_auth('crud:own_data')
@@ -184,7 +186,7 @@ def create_app(test_config=None):
             "babywords": babywords
         })
 
-    @app.route('/word/<word_id>')
+    @app.route('/word/<int:word_id>')
     @requires_auth('crud:own_data')
     def show_word(payload, word_id):
         identifier = payload['sub']
@@ -198,7 +200,7 @@ def create_app(test_config=None):
             "first_spoken": [fs.format() for fs in first_spoken]
         })
 
-    @app.route('/baby/<baby_id>/timeline')
+    @app.route('/baby/<int:baby_id>/timeline')
     @requires_auth('crud:own_data')
     def display_baby_timeline(payload, baby_id):
         identifier = payload['sub']
@@ -402,9 +404,9 @@ def create_app(test_config=None):
     def edit_first_spoken(payload, first_spoken_word_id):
         identifier = payload['sub']
         user = User.query.filter(User.identifier==identifier).one_or_none()
+        currFirstSpoken = FirstSpokenWord.query.filter_by(id=first_spoken_word_id).one_or_none()
+        if not currFirstSpoken or currFirstSpoken.user != user.id: abort(404)
         try:
-            currFirstSpoken = FirstSpokenWord.query.filter_by(id=first_spoken_word_id).one_or_none()
-            if not currFirstSpoken or currFirstSpoken.user != user.id: abort(404)
             body = request.get_json()
             #date and baby_id are required field. If left out, do not modify
             #user should delete item instead if they intend to remove the record
@@ -505,8 +507,8 @@ def create_app(test_config=None):
         if user:
             return jsonify({
                 "success": True,
-                "redirect": "to go homepage"
-            }), 301 #front end handles redirect after getting this message?
+                "redirect": "you are logged in!"
+            }), 200
         
         try:
             newUser = User(identifier=identifier)

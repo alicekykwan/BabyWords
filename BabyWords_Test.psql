@@ -1,0 +1,999 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 13.2
+-- Dumped by pg_dump version 13.2
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: babies; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.babies (
+    id integer NOT NULL,
+    "user" integer NOT NULL,
+    name character varying NOT NULL,
+    birthday date,
+    public boolean
+);
+
+
+ALTER TABLE public.babies OWNER TO testuser;
+
+--
+-- Name: babies_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.babies_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.babies_id_seq OWNER TO testuser;
+
+--
+-- Name: babies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.babies_id_seq OWNED BY public.babies.id;
+
+
+--
+-- Name: default_categories; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.default_categories (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.default_categories OWNER TO testuser;
+
+--
+-- Name: default_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.default_categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.default_categories_id_seq OWNER TO testuser;
+
+--
+-- Name: default_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.default_categories_id_seq OWNED BY public.default_categories.id;
+
+
+--
+-- Name: default_word_categories; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.default_word_categories (
+    id integer NOT NULL,
+    default_word integer NOT NULL,
+    default_category integer NOT NULL
+);
+
+
+ALTER TABLE public.default_word_categories OWNER TO testuser;
+
+--
+-- Name: default_word_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.default_word_categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.default_word_categories_id_seq OWNER TO testuser;
+
+--
+-- Name: default_word_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.default_word_categories_id_seq OWNED BY public.default_word_categories.id;
+
+
+--
+-- Name: default_words; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.default_words (
+    id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.default_words OWNER TO testuser;
+
+--
+-- Name: default_words_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.default_words_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.default_words_id_seq OWNER TO testuser;
+
+--
+-- Name: default_words_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.default_words_id_seq OWNED BY public.default_words.id;
+
+
+--
+-- Name: first_spoken_words; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.first_spoken_words (
+    id integer NOT NULL,
+    baby_id integer NOT NULL,
+    user_word integer NOT NULL,
+    "user" integer NOT NULL,
+    date date NOT NULL,
+    details character varying
+);
+
+
+ALTER TABLE public.first_spoken_words OWNER TO testuser;
+
+--
+-- Name: first_spoken_words_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.first_spoken_words_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.first_spoken_words_id_seq OWNER TO testuser;
+
+--
+-- Name: first_spoken_words_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.first_spoken_words_id_seq OWNED BY public.first_spoken_words.id;
+
+
+--
+-- Name: user_categories; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.user_categories (
+    id integer NOT NULL,
+    "user" integer,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.user_categories OWNER TO testuser;
+
+--
+-- Name: user_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.user_categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_categories_id_seq OWNER TO testuser;
+
+--
+-- Name: user_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.user_categories_id_seq OWNED BY public.user_categories.id;
+
+
+--
+-- Name: user_word_categories; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.user_word_categories (
+    id integer NOT NULL,
+    "user" integer,
+    user_word integer NOT NULL,
+    user_category integer NOT NULL
+);
+
+
+ALTER TABLE public.user_word_categories OWNER TO testuser;
+
+--
+-- Name: user_word_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.user_word_categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_word_categories_id_seq OWNER TO testuser;
+
+--
+-- Name: user_word_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.user_word_categories_id_seq OWNED BY public.user_word_categories.id;
+
+
+--
+-- Name: user_words; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.user_words (
+    id integer NOT NULL,
+    "user" integer,
+    name character varying NOT NULL
+);
+
+
+ALTER TABLE public.user_words OWNER TO testuser;
+
+--
+-- Name: user_words_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.user_words_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_words_id_seq OWNER TO testuser;
+
+--
+-- Name: user_words_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.user_words_id_seq OWNED BY public.user_words.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: testuser
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    identifier character varying NOT NULL,
+    name character varying
+);
+
+
+ALTER TABLE public.users OWNER TO testuser;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: testuser
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO testuser;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: testuser
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: babies id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.babies ALTER COLUMN id SET DEFAULT nextval('public.babies_id_seq'::regclass);
+
+
+--
+-- Name: default_categories id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_categories ALTER COLUMN id SET DEFAULT nextval('public.default_categories_id_seq'::regclass);
+
+
+--
+-- Name: default_word_categories id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_word_categories ALTER COLUMN id SET DEFAULT nextval('public.default_word_categories_id_seq'::regclass);
+
+
+--
+-- Name: default_words id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_words ALTER COLUMN id SET DEFAULT nextval('public.default_words_id_seq'::regclass);
+
+
+--
+-- Name: first_spoken_words id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.first_spoken_words ALTER COLUMN id SET DEFAULT nextval('public.first_spoken_words_id_seq'::regclass);
+
+
+--
+-- Name: user_categories id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_categories ALTER COLUMN id SET DEFAULT nextval('public.user_categories_id_seq'::regclass);
+
+
+--
+-- Name: user_word_categories id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_word_categories ALTER COLUMN id SET DEFAULT nextval('public.user_word_categories_id_seq'::regclass);
+
+
+--
+-- Name: user_words id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_words ALTER COLUMN id SET DEFAULT nextval('public.user_words_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: babies; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.babies (id, "user", name, birthday, public) FROM stdin;
+1	1	Benji	2019-10-20	f
+\.
+
+
+--
+-- Data for Name: default_categories; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.default_categories (id, name) FROM stdin;
+1	Food
+2	Colors
+3	Animals
+4	Bathtime
+\.
+
+
+--
+-- Data for Name: default_word_categories; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.default_word_categories (id, default_word, default_category) FROM stdin;
+1	1	1
+2	2	1
+3	3	1
+4	4	1
+5	5	1
+6	6	1
+7	7	1
+8	8	1
+9	9	1
+10	10	1
+11	11	1
+12	12	1
+13	13	1
+14	14	1
+15	15	1
+16	16	2
+17	17	2
+18	18	2
+19	19	2
+20	20	2
+21	21	2
+22	22	2
+23	23	2
+24	24	2
+25	25	2
+26	26	2
+27	27	2
+28	28	2
+29	29	3
+30	30	3
+31	31	3
+32	32	3
+33	33	3
+34	34	3
+35	35	3
+36	36	3
+37	37	3
+38	38	3
+39	39	3
+40	40	3
+41	41	3
+42	42	4
+43	43	4
+44	44	4
+45	45	4
+46	46	4
+47	47	4
+48	48	4
+49	49	4
+50	50	4
+51	51	4
+52	52	4
+53	53	4
+54	54	4
+55	55	4
+56	56	4
+57	57	4
+58	58	4
+59	59	4
+60	60	4
+61	61	4
+\.
+
+
+--
+-- Data for Name: default_words; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.default_words (id, name) FROM stdin;
+1	Milk
+2	More
+3	Eat
+4	Water
+5	Cracker
+6	Cheese
+7	Cereal
+8	Cheerios
+9	Yogurt
+10	Bread
+11	Meat
+12	Pizza
+13	Avocado
+14	Egg
+15	Macaroni
+16	Red
+17	Orange
+18	Green
+19	Blue
+20	Yellow
+21	Purple
+22	Black
+23	White
+24	Brown
+25	Grey
+26	Pink
+27	Gold
+28	Silver
+29	Bird
+30	Cat
+31	Chicken
+32	Cow
+33	Dog
+34	Donkey
+35	Duck
+36	Goat
+37	Horse
+38	Pig
+39	Sheep
+40	Rooster
+41	Turkey
+42	Bath
+43	Brush
+44	Bubbles
+45	Clean
+46	Comb
+47	Dirty
+48	Hair Dryer
+49	Naked
+50	Shampoo
+51	Shower
+52	Soap
+53	Toothbrush
+54	Towel
+55	Wash
+56	Wash Hands
+57	Hot
+58	Cold
+59	Warm
+60	Poop
+61	Potty
+\.
+
+
+--
+-- Data for Name: first_spoken_words; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.first_spoken_words (id, baby_id, user_word, "user", date, details) FROM stdin;
+1	1	1	1	2021-03-28	used sign too!
+2	1	2	1	2021-03-29	very excited!
+\.
+
+
+--
+-- Data for Name: user_categories; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.user_categories (id, "user", name) FROM stdin;
+1	1	Food
+2	1	Colors
+3	1	Animals
+4	1	Bathtime
+\.
+
+
+--
+-- Data for Name: user_word_categories; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.user_word_categories (id, "user", user_word, user_category) FROM stdin;
+1	1	1	1
+2	1	2	1
+3	1	3	1
+4	1	4	1
+5	1	5	1
+6	1	6	1
+7	1	7	1
+8	1	8	1
+9	1	9	1
+10	1	10	1
+11	1	11	1
+12	1	12	1
+13	1	13	1
+14	1	14	1
+15	1	15	1
+16	1	16	2
+17	1	17	2
+18	1	18	2
+19	1	19	2
+20	1	20	2
+21	1	21	2
+22	1	22	2
+23	1	23	2
+24	1	24	2
+25	1	25	2
+26	1	26	2
+27	1	27	2
+28	1	28	2
+29	1	29	3
+30	1	30	3
+31	1	31	3
+32	1	32	3
+33	1	33	3
+34	1	34	3
+35	1	35	3
+36	1	36	3
+37	1	37	3
+38	1	38	3
+39	1	39	3
+40	1	40	3
+41	1	41	3
+42	1	42	4
+43	1	43	4
+44	1	44	4
+45	1	45	4
+46	1	46	4
+47	1	47	4
+48	1	48	4
+49	1	49	4
+50	1	50	4
+51	1	51	4
+52	1	52	4
+53	1	53	4
+54	1	54	4
+55	1	55	4
+56	1	56	4
+57	1	57	4
+58	1	58	4
+59	1	59	4
+60	1	60	4
+61	1	61	4
+\.
+
+
+--
+-- Data for Name: user_words; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.user_words (id, "user", name) FROM stdin;
+1	1	Milk
+2	1	More
+3	1	Eat
+4	1	Water
+5	1	Cracker
+6	1	Cheese
+7	1	Cereal
+8	1	Cheerios
+9	1	Yogurt
+10	1	Bread
+11	1	Meat
+12	1	Pizza
+13	1	Avocado
+14	1	Egg
+15	1	Macaroni
+16	1	Red
+17	1	Orange
+18	1	Green
+19	1	Blue
+20	1	Yellow
+21	1	Purple
+22	1	Black
+23	1	White
+24	1	Brown
+25	1	Grey
+26	1	Pink
+27	1	Gold
+28	1	Silver
+29	1	Bird
+30	1	Cat
+31	1	Chicken
+32	1	Cow
+33	1	Dog
+34	1	Donkey
+35	1	Duck
+36	1	Goat
+37	1	Horse
+38	1	Pig
+39	1	Sheep
+40	1	Rooster
+41	1	Turkey
+42	1	Bath
+43	1	Brush
+44	1	Bubbles
+45	1	Clean
+46	1	Comb
+47	1	Dirty
+48	1	Hair Dryer
+49	1	Naked
+50	1	Shampoo
+51	1	Shower
+52	1	Soap
+53	1	Toothbrush
+54	1	Towel
+55	1	Wash
+56	1	Wash Hands
+57	1	Hot
+58	1	Cold
+59	1	Warm
+60	1	Poop
+61	1	Potty
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: testuser
+--
+
+COPY public.users (id, identifier, name) FROM stdin;
+1	auth0|6062c7196e655000707dd4f6	\N
+\.
+
+
+--
+-- Name: babies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.babies_id_seq', 1, true);
+
+
+--
+-- Name: default_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.default_categories_id_seq', 4, true);
+
+
+--
+-- Name: default_word_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.default_word_categories_id_seq', 61, true);
+
+
+--
+-- Name: default_words_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.default_words_id_seq', 61, true);
+
+
+--
+-- Name: first_spoken_words_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.first_spoken_words_id_seq', 2, true);
+
+
+--
+-- Name: user_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.user_categories_id_seq', 4, true);
+
+
+--
+-- Name: user_word_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.user_word_categories_id_seq', 61, true);
+
+
+--
+-- Name: user_words_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.user_words_id_seq', 61, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: testuser
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+
+
+--
+-- Name: babies babies_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.babies
+    ADD CONSTRAINT babies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: default_categories default_categories_name_key; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_categories
+    ADD CONSTRAINT default_categories_name_key UNIQUE (name);
+
+
+--
+-- Name: default_categories default_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_categories
+    ADD CONSTRAINT default_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: default_word_categories default_word_categories_default_word_default_category_key; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_word_categories
+    ADD CONSTRAINT default_word_categories_default_word_default_category_key UNIQUE (default_word, default_category);
+
+
+--
+-- Name: default_word_categories default_word_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_word_categories
+    ADD CONSTRAINT default_word_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: default_words default_words_name_key; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_words
+    ADD CONSTRAINT default_words_name_key UNIQUE (name);
+
+
+--
+-- Name: default_words default_words_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_words
+    ADD CONSTRAINT default_words_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: first_spoken_words first_spoken_words_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.first_spoken_words
+    ADD CONSTRAINT first_spoken_words_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_categories user_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_categories
+    ADD CONSTRAINT user_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_categories user_categories_user_name_key; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_categories
+    ADD CONSTRAINT user_categories_user_name_key UNIQUE ("user", name);
+
+
+--
+-- Name: user_word_categories user_word_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_word_categories
+    ADD CONSTRAINT user_word_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_words user_words_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_words
+    ADD CONSTRAINT user_words_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_identifier_key; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_identifier_key UNIQUE (identifier);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: babies babies_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.babies
+    ADD CONSTRAINT babies_user_fkey FOREIGN KEY ("user") REFERENCES public.users(id);
+
+
+--
+-- Name: default_word_categories default_word_categories_default_category_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_word_categories
+    ADD CONSTRAINT default_word_categories_default_category_fkey FOREIGN KEY (default_category) REFERENCES public.default_categories(id);
+
+
+--
+-- Name: default_word_categories default_word_categories_default_word_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.default_word_categories
+    ADD CONSTRAINT default_word_categories_default_word_fkey FOREIGN KEY (default_word) REFERENCES public.default_words(id);
+
+
+--
+-- Name: first_spoken_words first_spoken_words_baby_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.first_spoken_words
+    ADD CONSTRAINT first_spoken_words_baby_id_fkey FOREIGN KEY (baby_id) REFERENCES public.babies(id);
+
+
+--
+-- Name: first_spoken_words first_spoken_words_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.first_spoken_words
+    ADD CONSTRAINT first_spoken_words_user_fkey FOREIGN KEY ("user") REFERENCES public.users(id);
+
+
+--
+-- Name: first_spoken_words first_spoken_words_user_word_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.first_spoken_words
+    ADD CONSTRAINT first_spoken_words_user_word_fkey FOREIGN KEY (user_word) REFERENCES public.user_words(id);
+
+
+--
+-- Name: user_categories user_categories_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_categories
+    ADD CONSTRAINT user_categories_user_fkey FOREIGN KEY ("user") REFERENCES public.users(id);
+
+
+--
+-- Name: user_word_categories user_word_categories_user_category_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_word_categories
+    ADD CONSTRAINT user_word_categories_user_category_fkey FOREIGN KEY (user_category) REFERENCES public.user_categories(id);
+
+
+--
+-- Name: user_word_categories user_word_categories_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_word_categories
+    ADD CONSTRAINT user_word_categories_user_fkey FOREIGN KEY ("user") REFERENCES public.users(id);
+
+
+--
+-- Name: user_word_categories user_word_categories_user_word_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_word_categories
+    ADD CONSTRAINT user_word_categories_user_word_fkey FOREIGN KEY (user_word) REFERENCES public.user_words(id);
+
+
+--
+-- Name: user_words user_words_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: testuser
+--
+
+ALTER TABLE ONLY public.user_words
+    ADD CONSTRAINT user_words_user_fkey FOREIGN KEY ("user") REFERENCES public.users(id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
