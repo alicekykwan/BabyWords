@@ -2,10 +2,10 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, Date, Boolean, create_engine, UniqueConstraint
 import os
 
-
-# database name, username and password are in
-# setup.sh file in the same directory \
-# run "source setup.sh" in terminal 
+# for local database:
+    # database name, username and password are in
+    # setup.sh file in the same directory \
+    # run "source setup.sh" in terminal 
 
 database_name = os.environ.get('database_name')
 database_username = os.environ.get('database_username')
@@ -16,6 +16,9 @@ database_path = "postgresql://{}:{}@{}/{}".format(
     database_user_pw,
     'localhost:5432',
     database_name)
+
+# for Heroku
+database_path = os.environ.get('DATABASE_URL').replace("://", "ql://", 1)
 
 db = SQLAlchemy()
 
