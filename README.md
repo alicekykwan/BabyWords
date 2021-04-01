@@ -15,7 +15,6 @@ Run the following to install required pacakges:
 pip install requirements.txt
 ```
 
-
 ### 2.2 Database Setup
 With Postgres running, create a database (sample below refers to a database named "BabyWords") and populate the database using the BabyWords_Test.psql file provided. 
 From terminal run:
@@ -27,7 +26,6 @@ From terminal run the following to supply the environmental variables to the API
 ```
 source setup.sh
 ```
-
 
 ### 2.3 Auth0 Setup
 The project is configured to work with Auth0 to manage Role-based access control.
@@ -50,8 +48,16 @@ python3 app.py
 ```
 The application is run on http://0.0.0.0:8080/ by default 
 
+## 3. Heroku
+The API is hosted live via [https://babywords.herokuapp.com/](https://babywords.herokuapp.com/).
 
-## 3. Tests
+This is a public endpoint you may visit without a JWT token:
+https://babywords.herokuapp.com/baby/1/timeline/public
+
+All other endpoints will require a Bearer token. You may find sample tokens in setup.sh 
+
+
+## 4. Tests
 Run the following commands, skipping the dropdb line if running for the first time:
 ```
 dropdb BabyWords_Test 
@@ -60,7 +66,7 @@ psql BabyWords_Test < BabyWords_Test.psql
 python test_app.py
 ```
 
-## 4. Database Diagram
+## 5. Database Diagram
 All tables reside in the same database.
 This diagram shows the relationships between the default tables:
 <img src="readme_images/default_tables.png" width="400">
@@ -69,7 +75,7 @@ This diagram shows the relationships between the user tables:
 <img src="readme_images/user_tables.png" width="600">
 
 
-## 5. API Reference
+## 6. API Reference
 ### GET /user
 - Fetches user id and name
 - Sample Request
@@ -634,7 +640,7 @@ curl http://0.0.0.0:8080/default_word/3 -X DELETE -H "Content-Type: application/
 }
 ```
 
-## 6 Acknowledgements
+## 7. Acknowledgements
 - Selection of most common baby first words and categories is based on Bill White's Baby Sign Language classes.  
 
 
